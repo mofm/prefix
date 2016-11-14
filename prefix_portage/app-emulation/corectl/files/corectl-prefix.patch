@@ -1,0 +1,96 @@
+--- a/Makefile	2016-11-15 00:49:36.000000000 +0300
++++ b/Makefile	2016-11-15 01:47:57.000000000 +0300
+@@ -8,7 +8,7 @@
+ GOOS ?= $(shell go env GOOS)
+ CGO_ENABLED = 1
+ GO15VENDOREXPERIMENT = 1
+-MACOS = $(shell sw_vers -productVersion | /usr/bin/awk -F '.' '{print $$1 "." $$2}')
++MACOS = $(shell sw_vers -productVersion | ${EPREFIX}/usr/bin/awk -F '.' '{print $$1 "." $$2}')
+ 
+ BUILD_DIR ?= $(shell pwd)/bin
+ GOPATH := $(shell cd ../../../.. ; pwd)
+@@ -19,20 +19,20 @@
+ VERSION := $(shell git describe --abbrev=6 --dirty=+untagged --always --tags)
+ BUILDDATE = $(shell /bin/date "+%FT%T%Z")
+ 
+-OPAMROOT ?= ~/.opam
+-HYPERKIT_GIT = "https://github.com/docker/hyperkit.git"
+-HYPERKIT_COMMIT = 8975f80ae46ef315e600552328ba63af09b742f7
+-
+-MKDIR = /bin/mkdir -p
+-CP = /bin/cp
+-MV = /bin/mv
+-RM = /bin/rm -rf
+-DATE = /bin/date
+-LN = /bin/ln -sf
+-SED = /usr/bin/sed
+-GREP = /usr/bin/grep
+-TOUCH = /usr/bin/touch
+-GIT = /usr/bin/git
++#OPAMROOT ?= ~/.opam
++#HYPERKIT_GIT = "https://github.com/docker/hyperkit.git"
++#HYPERKIT_COMMIT = 8975f80ae46ef315e600552328ba63af09b742f7
++
++MKDIR = ${EPREFIX}/bin/mkdir -p
++CP = ${EPREFIX}/bin/cp
++MV = ${EPREFIX}/bin/mv
++RM = ${EPREFIX}/bin/rm -rf
++DATE = ${EPREFIX}/bin/date
++LN = ${EPREFIX}/bin/ln -sf
++SED = ${EPREFIX}/bin/sed
++GREP = ${EPREFIX}/bin/grep
++TOUCH = ${EPREFIX}/usr/bin/touch
++GIT = ${EPREFIX}/usr/bin/git
+ 
+ ifeq ($(DEBUG),true)
+     GO_GCFLAGS := $(GO_GCFLAGS) -N -l
+@@ -84,7 +84,7 @@
+ 		--tag $(VERSION) --name "corectl-$(VERSION)-macOS-$(GOARCH).tar.gz" \
+ 		--file $(PROG)-$(VERSION).tar.gz
+ 
+-hyperkit: force
++#hyperkit: force
+ 	# - ocaml stack
+ 	#   - 1st run
+ 	# 	  - brew install opam libev
+@@ -95,23 +95,23 @@
+ 	#   - build
+ 	#     - make clean
+ 	#     - eval `opam config env` && make all
+-	$(MKDIR) $(BUILD_DIR)
+-	$(RM) $@
+-	$(GIT) clone $(HYPERKIT_GIT)
+-	cd $@; \
+-		$(GIT) checkout $(HYPERKIT_COMMIT); \
+-		$(MAKE) clean; \
+-		$(shell opam config env) $(MAKE) all
+-	$(CP) $@/build/com.docker.hyperkit $(BUILD_DIR)/corectld.runner
+-	$(RM) examples/dtrace
+-	cd $@; \
+-		$(SED) -i.bak -e "s,com.docker.hyperkit,corectld.runner,g" dtrace/*.d; \
+-		$(RM) dtrace/*.bak ; \
+-		$(CP) -r dtrace ../examples
+-
+-qcow-tool: force
+-	$(RM) $(BUILD_DIR)/$@
+-	$(CP) $(OPAMROOT)/system/bin/$@ $(BUILD_DIR)/$@
++#	$(MKDIR) $(BUILD_DIR)
++#	$(RM) $@
++#	$(GIT) clone $(HYPERKIT_GIT)
++#	cd $@; \
++#		$(GIT) checkout $(HYPERKIT_COMMIT); \
++#		$(MAKE) clean; \
++#		$(shell opam config env) $(MAKE) all
++#	$(CP) $@/build/com.docker.hyperkit $(BUILD_DIR)/corectld.runner
++#	$(RM) examples/dtrace
++#	cd $@; \
++#		$(SED) -i.bak -e "s,com.docker.hyperkit,corectld.runner,g" dtrace/*.d; \
++#		$(RM) dtrace/*.bak ; \
++#		$(CP) -r dtrace ../examples
++
++#qcow-tool: force
++#	$(RM) $(BUILD_DIR)/$@
++#	$(CP) $(OPAMROOT)/system/bin/$@ $(BUILD_DIR)/$@
+ 
+ documentation/man: cmd force
+ 	$(RM) $@
