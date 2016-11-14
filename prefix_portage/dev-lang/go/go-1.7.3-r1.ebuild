@@ -191,10 +191,8 @@ src_install()
 	# Once this is fixed, we can consider using the doc use flag to control
 	# installing the doc and src directories.
 	# [1] https://golang.org/issue/2775
-	doins -r bin doc lib pkg src
+	doins -r bin doc lib pkg src misc
 	fperms -R +x /usr/lib/go/bin /usr/lib/go/pkg/tool
-
-	cp -a misc "${D}"/usr/lib/go/misc
 
 	if go_cross_compile; then
 		bin_path="bin/$(go_tuple)"
