@@ -11,27 +11,33 @@ MY_PV=${PV/_/}
 
 inherit toolchain-funcs
 
-BOOTSTRAP_DIST="https://storage.googleapis.com/golang/"
-MY_BV="1.7"
-SRC_URI="!gccgo? (
-kernel_Darwin? (
-	x64-macos? ( ${BOOTSTRAP_DIST}/go${MY_BV}.darwin-amd64.tar.gz )
-)
-)
-"
+BOOTSTRAP_ROOT="https://storage.googleapis.com/golang"
 
-if [[ ${PV} = 9999 ]]; then
-	EGIT_REPO_URI="git://github.com/golang/go.git"
-	inherit git-r3
-else
-	SRC_URI+="https://storage.googleapis.com/golang/go${MY_PV}.src.tar.gz"
-	case ${PV} in
-		*9999*|*_rc*) ;;
-		*)
-			KEYWORDS="-* ~amd64 ~arm ~arm64 ~ppc64 ~x86 ~amd64-fbsd ~x86-fbsd ~x64-macos ~x64-solaris"
-			;;
-	esac
-fi
+case ${CHOST} in
+	x86_64-apple-darwin9|x86_64-apple-darwin1[0123456])
+		BOOTSTRAP_PACKAGE="go${PV}.darwin-amd64.tar.gz"
+		;;
+	i*86-pc-linux-gnu)
+		BOOTSTRAP_PACKAGE="go${PV}.linux-386.tar.gz"
+		;;
+	x86_64-pc-linux-gnu)
+		BOOTSTRAP_PACKAGE="go${PV}.linux-amd64.tar.gz"
+		;;
+	i386-pc-freebsd*)
+		BOOTSTRAP_PACKAGE="go${PV}.freebsd-386.tar.gz"
+		;;
+	x86_64-pc-freebsd*)
+		BOOTSTRAP_PACKAGE="go${PV}.freebsd-amd64.tar.gz"
+		;;
+	*)
+		echo "Download failed: unknown arch"
+		exit 1
+		;;
+esac
+
+SRC_URI="https://storage.googleapis.com/golang/go${MY_PV}.src.tar.gz \
+		 "${BOOTSTRAP_ROOT}/${BOOTSTRAP_PACKAGE}" \
+		 "
 
 DESCRIPTION="A concurrent garbage collected and typesafe programming language"
 HOMEPAGE="http://www.golang.org"
@@ -61,9 +67,7 @@ STRIP_MASK="/usr/lib/go/pkg/*.a
 	/usr/lib/go/src/debug/dwarf/testdata/*
 	/usr/lib/go/src/runtime/race/*.syso"
 
-if [[ ${PV} != 9999 ]]; then
-	S="${WORKDIR}"/go
-fi
+S="${WORKDIR}"/go
 
 go_arch()
 {
@@ -128,15 +132,15 @@ pkg_pretend()
 
 src_unpack()
 {
-	if [[ ${PV} = 9999 ]]; then
-		git-r3_src_unpack
-	fi
-	default
+	unpack ${BOOTSTRAP_PACKAGE}
+	mv ${WORKDIR}/go ${WORKDIR}/go${PV}-$(go_os)-$(go_arch)
+	unpack go${MY_PV}.src.tar.gz
+
 }
 
 src_compile()
 {
-	export GOROOT_BOOTSTRAP="${WORKDIR}"/go1.7-$(go_os)-$(go_arch)
+	export GOROOT_BOOTSTRAP="${WORKDIR}"/go${PV}-$(go_os)-$(go_arch)
 	if use gccgo; then
 		mkdir -p "${GOROOT_BOOTSTRAP}/bin" || die
 		local go_binary=$(gcc-config --get-bin-path)/go-5
