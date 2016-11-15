@@ -20,6 +20,7 @@ HOMEPAGE="https://git-lfs.github.com/"
 
 LICENSE="MIT BSD BSD-2 BSD-4 Apache-2.0"
 SLOT="0"
+KEYWORDS="~amd64 ~x86 ~x64-macos"
 IUSE="doc"
 
 DEPEND="

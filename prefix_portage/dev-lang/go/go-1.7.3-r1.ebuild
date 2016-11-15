@@ -44,6 +44,7 @@ HOMEPAGE="http://www.golang.org"
 
 LICENSE="BSD"
 SLOT="0/${PV}"
+KEYWORDS="~amd64 ~x86 ~x64-macos"
 IUSE="gccgo"
 
 DEPEND="gccgo? ( >=sys-devel/gcc-5[go] )"

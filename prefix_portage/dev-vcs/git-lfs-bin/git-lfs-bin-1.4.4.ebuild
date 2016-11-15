@@ -27,7 +27,7 @@ SRC_URI="https://github.com/github/git-lfs/releases/download/v${PV}/${MY_P}.tar.
 
 LICENSE="MIT BSD BSD-2 BSD-4 Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~x86 ~x64-macos"
 
 RDEPEND="
     dev-vcs/git
