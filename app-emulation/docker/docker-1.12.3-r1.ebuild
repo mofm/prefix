@@ -60,9 +60,9 @@ src_install() {
 	dodoc -r docs/*
 	doman man/man*/*
 
-    dobashcomp contrib/completion/bash/*
+	dobashcomp contrib/completion/bash/*
 
-    insinto /usr/share/zsh/site-functions
+	insinto /usr/share/zsh/site-functions
 	doins contrib/completion/zsh/_*
 
 	insinto /usr/share/vim/vimfiles
