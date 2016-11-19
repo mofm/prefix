@@ -21,10 +21,11 @@ SRC_URI+=" http://git.kernel.org/cgit/fs/ext2/e2fsprogs.git/patch/?id=d33e690fe7
 
 LICENSE="GPL-2 BSD"
 SLOT="0"
-KEYWORDS="alpha ~amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc ~x86 -x86-fbsd ~amd64-linux ~arm-linux ~x86-linux ~m68k-mint"
+KEYWORDS="alpha ~amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc ~x86 -x86-fbsd ~amd64-linux ~arm-linux ~x86-linux ~m68k-mint ~x64-macos"
 IUSE="fuse nls static-libs elibc_FreeBSD"
 
 RDEPEND="~sys-libs/${PN}-libs-${PV}
+	kernel_linux? ( >=sys-apps/util-linux-2.16 )
 	fuse? ( sys-fs/fuse )
 	nls? ( virtual/libintl )"
 DEPEND="${RDEPEND}
@@ -39,16 +40,19 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-1.40-fbsd.patch
 	"${FILESDIR}"/${PN}-1.42.13-fix-build-cflags.patch #516854
 	"${FILESDIR}"/${PN}-1.43-sysmacros.patch
-	"${FILESDIR}"/${P}-darwin.patch
 
 	# Upstream patches (can usually removed with next version bump)
 	"${DISTDIR}"/${P}-missing_uninit_bg.patch
 )
 
 src_prepare() {
-	#if [[ ${CHOST} == *-mint* ]] ; then
-	#	PATCHES+=( "${WORKDIR}"/${PN}-1.42.9-mint-r1.patch )
-	#fi
+	if [[ ${CHOST} == *-mint* ]] ; then
+		PATCHES+=( "${WORKDIR}"/${PN}-1.42.9-mint-r1.patch )
+	fi
+
+	if [[ ${CHOST} == *-darwin* ]] ; then
+		PATCHES+=( "${FILESDIR}"/${P}-darwin.patch )
+	fi
 
 	epatch "${PATCHES[@]}"
 
